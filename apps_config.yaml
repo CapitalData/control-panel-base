@@ -1,0 +1,143 @@
+# Control Panel Application Configuration
+# ========================================
+# Define Python tools and Dash applications to manage
+#
+# NOTE: This is a distribution copy. Paths are relative to BASE_DIR, which
+# is set in controlpanel_app.py or via CONTROL_PANEL_APPS_DIR env var.
+# Default: points to GUI_and_components folder in the main workspace.
+
+python_tools:
+  - id: invoice-parser
+    name: Invoice Parser
+    path: invoice-parser/src/main.py
+    type: script
+    description: Parse invoice PDFs and extract data
+
+  - id: invoice-generation
+    name: Invoice Generator
+    path: invoice_generation/Invoice_generator.ipynb
+    type: notebook
+    description: Generate invoices (Jupyter Notebook)
+
+dash_apps:
+  - id: learning-platform
+    name: Learning Platform
+    path: learning_platform/app.py
+    port: 8050
+    description: Educational platform with courses and materials
+    reverse_proxy:
+      env_prefix: LEARNING_PLATFORM
+      remote_port: 19050
+
+  - id: finance-tracker
+    name: Finance Tracker
+    path: finance_tracker/dash_app.py
+    port: 8051
+    description: Financial tracking and visualization dashboard
+    reverse_proxy:
+      env_prefix: FINANCE_TRACKER
+      remote_port: 19051
+
+  - id: invoice-tool
+    name: Invoice Tool
+    path: finance_tracker/app.py
+    port: 8049
+    description: invoice processing workflow
+    reverse_proxy:
+      env_prefix: INVOICE_PROCESSOR
+      remote_port: 19053
+
+  - id: dash-cards
+    name: Dash Cards Frontend
+    path: dash_cards_frontends/app.py
+    port: 8052
+    description: Card-based UI components demo
+    reverse_proxy:
+      env_prefix: DASH_CARDS
+      remote_port: 19052
+
+  - id: ollama-llm
+    name: ollama-llm Frontend
+    path: ollama_llm/app.py
+    port: 11434
+    description: Ollama LLM Frontend
+    reverse_proxy:
+      env_prefix: OLLAMA_LLM
+      remote_port: 19053
+
+# App Skins - Define visual themes for different personas
+skins:
+  default:
+    name: Default Theme
+    colors:
+      primary: "#007bff"
+      secondary: "#6c757d"
+      background: "#ffffff"
+      surface: "#f8f9fa"
+      text: "#212529"
+      border: "#dee2e6"
+    font_family: "Arial, sans-serif"
+
+  dark:
+    name: Dark Theme
+    colors:
+      primary: "#0d6efd"
+      secondary: "#6c757d"
+      background: "#1a1a1a"
+      surface: "#2d2d2d"
+      text: "#f8f9fa"
+      border: "#404040"
+    font_family: "Arial, sans-serif"
+
+  titanium:
+    name: Brushed Metal Titanium
+    colors:
+      primary: "#8b9dc3"
+      secondary: "#7a8a9e"
+      background: "#c8d0d8"
+      surface: "#dfe3e8"
+      text: "#2c3e50"
+      border: "#9ea7b0"
+      accent: "#b0bec5"
+      highlight: "#a3b4c7"
+    texture:
+      pattern: "linear-gradient(135deg, #c8d0d8 0%, #dfe3e8 25%, #c8d0d8 50%, #dfe3e8 75%, #c8d0d8 100%)"
+      overlay: "repeating-linear-gradient(90deg, rgba(255,255,255,0.03) 0px, rgba(255,255,255,0.03) 1px, transparent 1px, transparent 2px)"
+    metallic:
+      shine: "linear-gradient(180deg, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0.1) 50%, rgba(0,0,0,0.1) 100%)"
+      shadow: "0 2px 4px rgba(0,0,0,0.2), inset 0 1px 2px rgba(255,255,255,0.3)"
+    font_family: "'Segoe UI', 'Roboto', sans-serif"
+    font_weight: 500
+
+# User Personas - Define which apps each user type can access
+personas:
+  admin:
+    name: Administrator
+    skin: default
+    allowed_tools:
+      - invoice-parser
+      - invoice-generation
+    allowed_dash_apps:
+      - learning-platform
+      - finance-tracker
+      - dash-cards
+      - ollama-llm
+      - invoice-tool
+
+  developer:
+    name: Developer
+    skin: dark
+    allowed_tools:
+      - invoice-parser
+    allowed_dash_apps:
+      - learning-platform
+      - ollama-llm
+
+  public_user:
+    name: Public User
+    skin: titanium
+    allowed_tools:
+      - invoice-parser
+    allowed_dash_apps:
+      - learning-platform
+      - ollama-llm

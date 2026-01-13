@@ -1,0 +1,54 @@
+site_name: Control Panel Command Station Docs
+site_description: "Teachable documentation for the retro Control Panel command station"
+site_url: https://USERNAME.github.io/REPOSITORY
+repo_url: https://github.com/USERNAME/REPOSITORY
+repo_name: GitHub
+nav:
+  - Home: index.md
+  - DEMO Project Documentation: DEMO_project_documentation.md
+  - Slide Deck: DEMO_project_documentation_slides.md
+  - Quizzes:
+      - Docs Workflow Fundamentals: quizzes/docs_workflow_quiz_01.json
+      - MkDocs Build Lifecycle: quizzes/docs_workflow_quiz_02.json
+      - GitHub Pages Delivery: quizzes/docs_workflow_quiz_03.json
+      - Docusaurus Strategy: quizzes/docs_workflow_quiz_04.json
+      - Troubleshooting Runbooks: quizzes/docs_workflow_quiz_05.json
+plugins:
+  - search:
+      separator: '[\\s\\-]+'
+theme:
+  name: material
+  language: en
+  features:
+    - navigation.top
+    - navigation.expand
+    - navigation.sections
+    - navigation.tracking
+    - toc.integrate
+    - content.code.copy
+    - search.highlight
+    - search.suggest
+  palette:
+    - scheme: default
+      primary: brown
+      accent: amber
+    - scheme: slate
+      primary: brown
+      accent: lime
+markdown_extensions:
+  - admonition
+  - attr_list
+  - def_list
+  - toc:
+      permalink: true
+  - pymdownx.details
+  - pymdownx.superfences
+  - pymdownx.highlight
+  - pymdownx.snippets
+  - pymdownx.tabbed:
+      alternate_style: true
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/USERNAME/REPOSITORY
+  generator: false

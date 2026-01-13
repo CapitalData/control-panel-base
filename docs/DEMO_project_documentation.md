@@ -1,0 +1,113 @@
+# DEMO Project Documentation
+
+> A teachable walkthrough that turns the existing Control Panel README into living documentation, deployable with MkDocs + GitHub Pages, and extensible to Docusaurus when you need a richer doc portal.
+
+## 1. Map the Source Material
+
+1. **Inventory current assets**: collect the Control Panel README, persona notes, proxy env tables, and onboarding steps. Drop any supporting media (screenshots, diagrams) into `docs/assets/` so MkDocs can bundle them.
+2. **Slice content into modules**:
+   - *Mission & theme* → Overview
+   - *Runtime controls (personas, toggles)* → Operations Guide
+   - *Env vars, tunnels, subprocess safety* → Reference
+   - *Launch checklists + troubleshooting* → Playbooks
+3. **Decide audiences**: Admin (full cockpit), Scientist (restricted), Infrastructure (proxy ops). Each audience gets a short "You care about…" call-out at the top of the relevant section.
+
+> Tip: keep prose in Markdown and push screenshots/diagrams to lighter-weight formats (SVG/PNG). MkDocs auto-reloads during `mkdocs serve`, so edits are fast to preview.
+
+## 2. Initialize MkDocs Locally (10 min)
+
+```bash
+pip install mkdocs mkdocs-material pymdown-extensions
+mkdocs new .  # already done in this repo; creates mkdocs.yml + docs/
+```
+
+| Command | Purpose |
+| --- | --- |
+| `mkdocs serve` | Live preview at http://127.0.0.1:8000 while editing |
+| `mkdocs build` | Produces `/site` (static HTML) locally |
+| `mkdocs gh-deploy` | Builds + publishes to `gh-pages` branch |
+
+## 3. Authoring Flow for This Project
+
+1. Write in `docs/DEMO_project_documentation.md` (this file). Use headings that mirror cockpit workflows so operators can scan quickly.
+2. Use short callout blocks (e.g., `!!! note "Scientist Persona"`). The Material theme renders them as collapsible cards.
+3. Keep tables narrow: MkDocs handles responsive tables, but large 8+ column grids should be broken into subsections or definition lists.
+4. Embed code fences for env var snippets so the dark/light theme toggle remains legible.
+
+### Suggested Section Layout
+
+| Section | Questions Answered |
+| --- | --- |
+| Control Panel Mission | What is this console for? Who uses it? |
+| Persona Cockpits | Which persona sees which toggles? How do env vars pin a persona? |
+| Launch Recipes | Exact commands to start Utilities vs Reactors, including proxy toggles |
+| Reverse Proxy Deep Dive | How tunnels are spawned, health-checked, and torn down |
+| Extending the Console | How to add new scripts/cards safely |
+| Distribution Checklist | How to onboard a new operator |
+
+## 4. Customize Navigation, Theme, and Search
+
+```yaml
+nav:
+  - Home: index.md
+  - DEMO Project Documentation: DEMO_project_documentation.md
+  - Slide Deck: DEMO_project_documentation_slides.md
+  - Quizzes:
+      - Docs Workflow Fundamentals: quizzes/docs_workflow_quiz_01.json
+      - MkDocs Build Lifecycle: quizzes/docs_workflow_quiz_02.json
+      - GitHub Pages Delivery: quizzes/docs_workflow_quiz_03.json
+      - Docusaurus Strategy: quizzes/docs_workflow_quiz_04.json
+      - Troubleshooting Runbooks: quizzes/docs_workflow_quiz_05.json
+```
+
+- **Theme**: `material` offers instant dark/light toggle, nested navigation, and built-in search. Toggle features under `theme.features` to match how much chrome you want.
+- **Branding**: set `site_name`, `site_description`, and optionally `site_url` in `mkdocs.yml` so the generated metadata matches the Control Panel branding.
+- **Search**: Material bundles lunr.js search; no config needed beyond `plugins: [search]`, but you can add `separator: '[\s\-]+'` to better index `CONTROL_PANEL_*` tokens.
+- **Content Reuse**: use `!include` via the `pymdownx.snippets` extension if you want to single-source env var tables across README + docs.
+
+## 5. Automate Deploys with GitHub Actions
+
+1. Create `.github/workflows/mkdocs-deploy.yml` with:
+   - `actions/checkout@v4`
+   - `actions/setup-python` pinned to 3.11+
+   - `pip install mkdocs mkdocs-material pymdown-extensions`
+   - `mkdocs gh-deploy --force`
+2. In repo settings → Pages, choose `Deploy from branch`, `gh-pages`, `/ (root)`.
+3. Every push to `main` rebuilds documentation automatically. Add branch protection so only reviewed changes update the docs site.
+
+> Need staging? Point MkDocs at Azure Static Web Apps or Netlify by running `mkdocs build` in CI and uploading the `/site` artifact—identical static output.
+
+## 6. Enable Pages & Backfill History
+
+1. Run `mkdocs gh-deploy` once locally to create the `gh-pages` branch.
+2. In GitHub UI, enable Pages using that branch.
+3. Optional: add a `CNAME` file (`mkdocs.yml -> extra: social:`) if you have a custom domain like `docs.control-panel.io`.
+4. Add status badge to the README so everyone knows where the live docs live.
+
+## 7. Where Docusaurus Fits
+
+| Scenario | MkDocs | Docusaurus |
+| --- | --- | --- |
+| Pure Markdown SOPs | ✅ Minimal tooling | ⚪ Requires React build |
+| API docs with autogenerated nav | ➖ Needs plugins like mkdocstrings | ✅ Built-in sidebar generation |
+| Versioned docs / multiple locales | ⚪ Doable with plugins | ✅ First-class (docs versions + i18n) |
+| Blogging, landing pages, React widgets | ⚪ Limited (no React runtime) | ✅ Built on React + MDX |
+| Build speed / simplicity | ✅ Single `mkdocs` binary | ➖ Node/Yarn toolchain |
+
+**Recommendation**: Start with MkDocs for speed. If you outgrow it (need MDX components, doc versions, marketing pages), stand up a sibling `docs-docusaurus` directory. You can even feed the same Markdown into both by keeping shared content in `/docs/src/partials/` and importing as needed.
+
+## 8. Teach It Forward
+
+1. **Live demo**: run `mkdocs serve`, share screen, and show how edits propagate instantly.
+2. **Hands-on exercise**: ask learners to add a new section under "Reverse Proxy Deep Dive" describing one of their tunnels, then preview via MkDocs.
+3. **Assess understanding**: upload the JSON quizzes (see `docs/quizzes/`) into the Learning Platform so operators can self-check.
+4. **Slide deck**: present the Markdown in `DEMO_project_documentation_slides.md` through Marp, Docs to Deck, or GitPitch.
+
+## 9. Next Actions Checklist
+
+- [ ] Confirm Persona env vars documented for both admin & scientist cockpits
+- [ ] Record a 90-second walkthrough GIF of the retro console UI for the Overview section
+- [ ] Backfill reverse proxy diagrams (local → SSH tunnel → remote host)
+- [ ] Migrate onboarding checklist from README into `docs/ops/onboarding.md` for future trainees
+
+Once these boxes are checked, the Control Panel story lives in a discoverable, teachable knowledge base with automated hosting.
