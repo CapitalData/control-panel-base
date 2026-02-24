@@ -216,6 +216,38 @@ def load_config():
     
     with open(config_path, 'r') as f:
         config = yaml.safe_load(f)
+
+    if not isinstance(config, dict):
+        raise ValueError("apps_config.yaml must define a top-level mapping")
+
+    def _clean_entries(entries, section_name, required_keys):
+        """Skip malformed/null list entries so commented YAML stubs don't crash startup."""
+        cleaned = []
+        for index, entry in enumerate(entries or []):
+            if not isinstance(entry, dict):
+                print(
+                    f"[CONFIG][WARN] Skipping invalid {section_name}[{index}] entry: {entry!r}"
+                )
+                continue
+            missing = [key for key in required_keys if not entry.get(key)]
+            if missing:
+                print(
+                    f"[CONFIG][WARN] Skipping {section_name}[{index}] missing {', '.join(missing)}"
+                )
+                continue
+            cleaned.append(entry)
+        return cleaned
+
+    config['python_tools'] = _clean_entries(
+        config.get('python_tools', []),
+        'python_tools',
+        required_keys=('id', 'path')
+    )
+    config['dash_apps'] = _clean_entries(
+        config.get('dash_apps', []),
+        'dash_apps',
+        required_keys=('id', 'path', 'port')
+    )
     
     # Convert relative paths to absolute Path objects
     for tool in config.get('python_tools', []):
@@ -234,6 +266,12 @@ def load_config():
     # Build personas from config
     personas = {}
     for persona_id, persona_data in config.get('personas', {}).items():
+        if not isinstance(persona_data, dict):
+            print(f"[CONFIG][WARN] Skipping invalid persona '{persona_id}'")
+            continue
+        if not persona_data.get('name'):
+            print(f"[CONFIG][WARN] Skipping persona '{persona_id}' missing name")
+            continue
         personas[persona_id] = {
             "id": persona_id,
             "name": persona_data['name'],
@@ -254,8 +292,8 @@ DASH_APPS = config['dash_apps']
 TOOL_LOOKUP = {tool["id"]: tool for tool in PYTHON_TOOLS}
 DASH_LOOKUP = {app["id"]: app for app in DASH_APPS}
 
-LLM_TOOL_IDS = {"phoenix-arize"}
-LLM_DASH_IDS = {"ollama-llm", "ollama-chat"}
+LLM_TOOL_IDS = set()
+LLM_DASH_IDS = {"phoenix-arize", "ollama-llm", "ollama-chat"}
 FINANCE_KEYWORDS = ("finance", "invoice", "billing", "payment", "ledger")
 DEFAULT_PHOENIX_PROJECT_NAME = os.environ.get(
     "CONTROL_PANEL_PHOENIX_PROJECT_NAME",
@@ -436,8 +474,8 @@ def start_dash_app(app_id, extra_env=None):
         return False, "Already running"
     
     try:
-        # Check if port is available (Ollama can attach to an existing listener)
-        allow_port_in_use = app_id == "ollama-llm"
+        # Check if port is available (some apps can attach to an existing listener)
+        allow_port_in_use = app_id in {"ollama-llm", "phoenix-arize"}
         for proc in psutil.process_iter(['pid', 'name']):
             try:
                 for conn in proc.connections():

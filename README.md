@@ -217,8 +217,8 @@ If the Invoice Tool shows demo/empty data, use the reconnect guide:
 ## Usage
 
 ```bash
-cd control_panel
-conda activate bootcamp3 # or wherever you installed requirements
+cd control_panel_dist
+source ../.venv/bin/activate   # or: source .venv/bin/activate if standalone
 python controlpanel_app.py
 ```
 
@@ -242,8 +242,23 @@ Then open: http://localhost:8060
 ## Requirements
 
 ```bash
-pip install dash dash-bootstrap-components psutil
+# Preferred (uses uv for fast installs):
+uv pip install -r requirements.txt
+
+# Or with pip:
+pip install -r requirements.txt
 ```
+
+**Python 3.11+** is required. The recommended setup uses `uv` to manage the virtual environment:
+
+```bash
+# From the meta-repo root:
+uv venv --python 3.11
+source .venv/bin/activate
+uv pip install -r control_panel_dist/requirements.txt
+```
+
+See the [meta-repo QUICKSTART](../QUICKSTART.md) for full bootstrap and data migration instructions.
 
 ## Notes
 

@@ -12,20 +12,25 @@ python_tools:
     path: invoice-parser/src/main.py
     type: script
     description: Parse invoice PDFs and extract data
+    
+  ### notebook that scans all data and generates invioice for unpaid
+  ## check GIU and components for invoice generation notebook and add here if needed
+  - #id: invoice-generation
+    #name: Invoice Generator
+    #path: invoice_generation/Invoice_generator.ipynb
+    #type: notebook
+    #description: Generate invoices (Jupyter Notebook)
 
-  - id: invoice-generation
-    name: Invoice Generator
-    path: invoice_generation/Invoice_generator.ipynb
-    type: notebook
-    description: Generate invoices (Jupyter Notebook)
-
+dash_apps:
   - id: phoenix-arize
     name: Phoenix/Arize Traces
     path: phoenix_arize/app.py
-    type: service
+    port: 6006
     description: Local OpenTelemetry trace collection and visualization via Phoenix/Arize
+    reverse_proxy:
+      env_prefix: PHOENIX_ARIZE
+      remote_port: 19006
 
-dash_apps:
   - id: learning-platform
     name: Learning Platform
     path: learning_platform/app.py
@@ -74,9 +79,9 @@ dash_apps:
 # Panel Grouping - Tune UI categorization without editing Python code
 panel_groups:
   llm:
-    tool_ids:
-      - phoenix-arize
+    tool_ids: []
     dash_ids:
+      - phoenix-arize
       - ollama-llm
       - ollama-chat
     startup_order:
@@ -143,8 +148,8 @@ personas:
     allowed_tools:
       - invoice-parser
       - invoice-generation
-      - phoenix-arize
     allowed_dash_apps:
+      - phoenix-arize
       - finance-tracker
       - dash-cards
       - ollama-llm
@@ -156,8 +161,8 @@ personas:
     skin: dark
     allowed_tools:
       - invoice-parser
-      - phoenix-arize
     allowed_dash_apps:
+      - phoenix-arize
       - learning-platform
       - ollama-llm
       - ollama-chat
@@ -168,5 +173,6 @@ personas:
     allowed_tools:
       - invoice-parser
     allowed_dash_apps:
+      - phoenix-arize
       - ollama-llm
       - ollama-chat
