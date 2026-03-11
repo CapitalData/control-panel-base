@@ -1152,7 +1152,12 @@ def build_llm_panel_cards(tool_ids, app_ids):
 
 
 def build_finance_panel_cards(tool_ids, app_ids):
-    """Render combined utility/reactor cards for finance workflow."""
+    """Render combined utility/reactor cards for finance workflow.
+
+    NOTE: Apps claimed by the Manager panel (MANAGER_DASH_IDS) are excluded
+    here to avoid duplicate component IDs in the Dash layout, which would
+    break pattern-matching callbacks.
+    """
     finance_tools = [
         tool_id for tool_id in tool_ids
         if _is_finance_id(tool_id) and tool_id not in LLM_TOOL_IDS
@@ -1160,6 +1165,7 @@ def build_finance_panel_cards(tool_ids, app_ids):
     finance_apps = [
         app_id for app_id in app_ids
         if _is_finance_id(app_id) and app_id not in LLM_DASH_IDS
+        and app_id not in MANAGER_DASH_IDS
     ]
 
     children = []
@@ -1175,15 +1181,15 @@ def build_finance_panel_cards(tool_ids, app_ids):
 
 
 def build_manager_panel_cards(tool_ids, app_ids):
-    """Render management-focused cards: invoice workflow + finance dashboards."""
+    """Render management-focused cards: invoice workflow + finance dashboards.
+
+    NOTE: Only dash apps in MANAGER_DASH_IDS are rendered here.  Finance-related
+    tools stay in the Finance panel to avoid duplicate component IDs which break
+    pattern-matching callbacks.
+    """
     manager_apps = [
         app_id for app_id in app_ids
         if app_id in MANAGER_DASH_IDS
-    ]
-    # Include any finance/invoice tools (e.g. invoice-parser) for managers
-    manager_tools = [
-        tool_id for tool_id in tool_ids
-        if _is_finance_id(tool_id)
     ]
 
     children = [
@@ -1210,9 +1216,6 @@ def build_manager_panel_cards(tool_ids, app_ids):
             },
         ),
     ]
-    if manager_tools:
-        children.append(html.H6("Management Utilities", className="status-text mb-3"))
-        children.extend(build_tool_cards(manager_tools))
     if manager_apps:
         children.append(html.H6("Operational Dashboards", className="status-text mb-3 mt-4"))
         children.extend(build_dash_cards(manager_apps))
