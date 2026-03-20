@@ -76,6 +76,15 @@ dash_apps:
       env_prefix: OLLAMA_CHAT
       remote_port: 19054
 
+  - id: daily-use-aggregator
+    name: Daily Use Aggregator
+    path: daily_use_aggregator/app.py
+    port: 8052
+    description: Wiki (Outline), Notes (Obsidian), Email client, and Checklists with history replay
+    reverse_proxy:
+      env_prefix: DAILY_USE_AGGREGATOR
+      remote_port: 19052
+
 # Panel Grouping - Controls which tab each tool/app appears in.
 # Each panel must have explicit tool_ids and dash_ids lists.
 # Ordering within each list determines card render order.
@@ -97,6 +106,13 @@ panel_groups:
     dash_ids:
       - finance-tracker
       - invoice-tool
+
+  daily:
+    label: "🗂️ DAILY TOOLS"
+    tab_id: daily-panel
+    tool_ids: []
+    dash_ids:
+      - daily-use-aggregator
 
   manager:
     label: "📋 MANAGER TOOLS"
