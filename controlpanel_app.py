@@ -469,7 +469,20 @@ def start_python_tool(tool_id, extra_env=None):
     
     try:
         if tool["type"] == "notebook":
-            return False, "Notebooks must be opened manually in Jupyter"
+            # Open the notebook in VS Code (preferred); fall back to system default
+            notebook_path = str(tool["path"])
+            vs_code = shutil.which("code")
+            if vs_code:
+                subprocess.Popen([vs_code, notebook_path], close_fds=True)
+                opener = "VS Code"
+            else:
+                subprocess.Popen(["open", notebook_path], close_fds=True)
+                opener = "default app"
+            app_outputs[tool_id] = [
+                f"[{datetime.now().strftime('%H:%M:%S')}] Opened {tool['name']} in {opener}"
+            ]
+            app_status[tool_id] = "stopped"  # notebook viewer manages its own process
+            return True, "Notebook opened"
 
         env = os.environ.copy()
         if extra_env:

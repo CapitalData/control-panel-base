@@ -9,7 +9,7 @@
 python_tools:
   - id: invoice-parser
     name: Invoice Parser
-    path: invoice-parser/src/main.py
+    path: ../../SOPs_and_tools/GUI_and_components/invoice-parser/src/main.py
     type: script
     description: Parse invoice PDFs and extract data
     
@@ -23,7 +23,7 @@ python_tools:
 
   - id: kb-flow-analysis
     name: KanbanFlow Hours Analysis
-    path: finance_tracker/KB_Flow_analysis.ipynb
+    path: ../../SOPs_and_tools/GUI_and_components/finance_tracker/KB_Flow_analysis.ipynb
     type: notebook
     description: Direct API pull of KanbanFlow hours → SQLite → Dash dashboard / Google Sheets sync
 
@@ -211,7 +211,7 @@ personas:
       - invoice-tool
 
   BDSG:
-    name: Administrator
+    name: BDSG
     skin: default
     allowed_tools:
       - invoice-parser
