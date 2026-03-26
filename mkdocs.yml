@@ -7,6 +7,8 @@ nav:
   - Home: index.md
   - DEMO Project Documentation: DEMO_project_documentation.md
   - Slide Deck: DEMO_project_documentation_slides.md
+  - Developer Reference:
+      - Dash Compliance Guide: dash_compliance.md
   - Quizzes:
       - Docs Workflow Fundamentals: quizzes/docs_workflow_quiz_01.json
       - MkDocs Build Lifecycle: quizzes/docs_workflow_quiz_02.json

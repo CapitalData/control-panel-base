@@ -162,7 +162,7 @@ KeyError: 'WERKZEUG_SERVER_FD'
 **Apps that have been updated**:
 - ✅ learning_platform/app.py
 - ✅ dash_cards_frontends/app.py  
-- ✅ finance_tracker/dash_app.py
+- ✅ finance_tracker/finance_tracker_app.py
 
 ### Reverse Proxy Switches
 
@@ -173,7 +173,7 @@ Configure the tunnels via environment variables before launching the control pan
 | App | Required vars | Optional vars |
 | --- | --- | --- |
 | Learning Platform | `LEARNING_PLATFORM_PROXY_HOST`, `LEARNING_PLATFORM_PROXY_USER`, `LEARNING_PLATFORM_PROXY_REMOTE_PORT` | `LEARNING_PLATFORM_PROXY_KEY_PATH`, `LEARNING_PLATFORM_PROXY_BIND`, `LEARNING_PLATFORM_PROXY_SSH_ARGS`, `LEARNING_PLATFORM_PROXY_KEEPALIVE_INTERVAL`, `LEARNING_PLATFORM_PROXY_KEEPALIVE_COUNT`, `LEARNING_PLATFORM_PROXY_HEALTH_INTERVAL`, `LEARNING_PLATFORM_PROXY_HEALTH_TIMEOUT`, `LEARNING_PLATFORM_PROXY_HEALTH_ENABLED` |
-| Finance Tracker | `FINANCE_TRACKER_PROXY_HOST`, `FINANCE_TRACKER_PROXY_USER`, `FINANCE_TRACKER_PROXY_REMOTE_PORT` | `FINANCE_TRACKER_PROXY_KEY_PATH`, `FINANCE_TRACKER_PROXY_BIND`, `FINANCE_TRACKER_PROXY_SSH_ARGS`, `FINANCE_TRACKER_PROXY_KEEPALIVE_INTERVAL`, `FINANCE_TRACKER_PROXY_KEEPALIVE_COUNT`, `FINANCE_TRACKER_PROXY_HEALTH_INTERVAL`, `FINANCE_TRACKER_PROXY_HEALTH_TIMEOUT`, `FINANCE_TRACKER_PROXY_HEALTH_ENABLED` |
+| Finance Tracker (finance_tracker_app.py) | `FINANCE_TRACKER_PROXY_HOST`, `FINANCE_TRACKER_PROXY_USER`, `FINANCE_TRACKER_PROXY_REMOTE_PORT` | `FINANCE_TRACKER_PROXY_KEY_PATH`, `FINANCE_TRACKER_PROXY_BIND`, `FINANCE_TRACKER_PROXY_SSH_ARGS`, `FINANCE_TRACKER_PROXY_KEEPALIVE_INTERVAL`, `FINANCE_TRACKER_PROXY_KEEPALIVE_COUNT`, `FINANCE_TRACKER_PROXY_HEALTH_INTERVAL`, `FINANCE_TRACKER_PROXY_HEALTH_TIMEOUT`, `FINANCE_TRACKER_PROXY_HEALTH_ENABLED` |
 | Dash Cards | `DASH_CARDS_PROXY_HOST`, `DASH_CARDS_PROXY_USER`, `DASH_CARDS_PROXY_REMOTE_PORT` | `DASH_CARDS_PROXY_KEY_PATH`, `DASH_CARDS_PROXY_BIND`, `DASH_CARDS_PROXY_SSH_ARGS`, `DASH_CARDS_PROXY_KEEPALIVE_INTERVAL`, `DASH_CARDS_PROXY_KEEPALIVE_COUNT`, `DASH_CARDS_PROXY_HEALTH_INTERVAL`, `DASH_CARDS_PROXY_HEALTH_TIMEOUT`, `DASH_CARDS_PROXY_HEALTH_ENABLED` |
 - The remote server must allow `GatewayPorts yes` if you want to reach the tunnel from the public internet.
 - Use SSH keys (`*_PROXY_KEY_PATH`) instead of passwords. The control panel simply shells out to your local `ssh` binary.
@@ -210,7 +210,7 @@ If the Invoice Tool shows demo/empty data, use the reconnect guide:
 
 ### Dash Applications  
 - **Learning Platform** (port 8050) - Educational platform with courses
-- **Finance Tracker** (port 8051) - Financial tracking dashboard
+- **Finance Tracker (finance_tracker_app.py)** (port 8051) - Financial tracking dashboard (daily metrics, historical trends, Google Sheets)
 - **Dash Cards Frontend** (port 8052) - Card-based UI components
 - **Ollama LLM Frontend** (port 11434) - SciOps cockpit to drive the local Ollama stack
 

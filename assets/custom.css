@@ -10,6 +10,17 @@
     position: relative;
 }
 
+/* Self-process monitor panel — distinct teal/navy shade */
+.self-panel {
+    background: linear-gradient(145deg, #5ebef5 0%, #497294 50%, #051218 100%) !important;
+    border: 4px solid #1a6a8a !important;
+    box-shadow:
+        inset 0 2px 4px rgba(0,180,255,0.08),
+        inset 0 -2px 4px rgba(0,0,0,0.4),
+        0 8px 16px rgba(0,0,0,0.6),
+        0 0 18px rgba(0,120,180,0.15) !important;
+}
+
 /* Corner screws */
 .screw {
     width: 16px;

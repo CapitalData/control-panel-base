@@ -7,12 +7,6 @@
 # Default: points to GUI_and_components folder in the main workspace.
 
 python_tools:
-  - id: invoice-parser
-    name: Invoice Parser
-    path: ../../SOPs_and_tools/GUI_and_components/invoice-parser/src/main.py
-    type: script
-    description: Parse invoice PDFs and extract data
-    
   ### notebook that scans all data and generates invioice for unpaid
   ## check GIU and components for invoice generation notebook and add here if needed
   - #id: invoice-generation
@@ -23,7 +17,7 @@ python_tools:
 
   - id: kb-flow-analysis
     name: KanbanFlow Hours Analysis
-    path: ../../SOPs_and_tools/GUI_and_components/finance_tracker/KB_Flow_analysis.ipynb
+    path: finance_tracker/KB_Flow_analysis.ipynb
     type: notebook
     description: Direct API pull of KanbanFlow hours → SQLite → Dash dashboard / Google Sheets sync
 
@@ -47,22 +41,31 @@ dash_apps:
       remote_port: 19050
 
   - id: finance-tracker
-    name: Finance Tracker
-    path: finance_tracker/dash_app.py
+    name: Finance Tracker (finance_tracker_app.py)
+    path: finance_tracker/finance_tracker_app.py
     port: 8051
-    description: Financial tracking and visualization dashboard
+    description: Financial tracking and visualization dashboard — daily metrics, historical trends, Google Sheets integration
     reverse_proxy:
       env_prefix: FINANCE_TRACKER
       remote_port: 19051
 
   - id: invoice-tool
-    name: Invoice Tool
-    path: finance_tracker/app.py
+    name: Invoice Tool (invoice_tracker_app.py)
+    path: finance_tracker/invoice_tracker_app.py
     port: 8049
-    description: invoice processing workflow
+    description: Invoice workflow manager — Drive integration, Invoice Manager, Job Manager, QuickBooks sync
     reverse_proxy:
       env_prefix: INVOICE_PROCESSOR
       remote_port: 19053
+
+  - id: invoice-parser
+    name: Invoice Parser
+    path: finance_tracker/invoice-parser/src/invoice_parser.py
+    port: 8070
+    description: Parse PDF invoices with LLM extraction and export to Google Sheets
+    reverse_proxy:
+      env_prefix: INVOICE_PARSER
+      remote_port: 19070
 
   - id: ollama-llm
     name: ollama-llm Frontend
@@ -110,8 +113,8 @@ panel_groups:
     tab_id: finance-panel
     tool_ids:
       - kb-flow-analysis
-      - invoice-parser
     dash_ids:
+      - invoice-parser
       - finance-tracker
       - invoice-tool
 
@@ -199,12 +202,12 @@ personas:
     name: Administrator
     skin: default
     allowed_tools:
-      - invoice-parser
       - invoice-generation
       - kb-flow-analysis
     allowed_dash_apps:
       - phoenix-arize
       - finance-tracker
+      - invoice-parser
       - dash-cards
       - ollama-llm
       - ollama-chat
@@ -214,12 +217,12 @@ personas:
     name: BDSG
     skin: default
     allowed_tools:
-      - invoice-parser
       - invoice-generation
       - kb-flow-analysis
     allowed_dash_apps:
       - phoenix-arize
       - finance-tracker
+      - invoice-parser
       - dash-cards
       - ollama-llm
       - ollama-chat
@@ -228,10 +231,10 @@ personas:
   developer:
     name: Developer
     skin: dark
-    allowed_tools:
-      - invoice-parser
+    allowed_tools: []
     allowed_dash_apps:
       - phoenix-arize
+      - invoice-parser
       - ollama-llm
       - ollama-chat
 
@@ -240,11 +243,11 @@ personas:
     skin: management
     description: Operations & reporting overview
     allowed_tools:
-      - invoice-parser
       - invoice-generation
     allowed_dash_apps:
       - phoenix-arize
       - finance-tracker
+      - invoice-parser
       - ollama-llm
       - ollama-chat
       - invoice-tool
@@ -253,9 +256,9 @@ personas:
   public_user:
     name: Public User
     skin: titanium
-    allowed_tools:
-      - invoice-parser
+    allowed_tools: []
     allowed_dash_apps:
       - phoenix-arize
+      - invoice-parser
       - ollama-llm
       - ollama-chat

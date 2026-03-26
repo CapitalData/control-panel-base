@@ -252,10 +252,10 @@ def load_config():
     
     # Convert relative paths to absolute Path objects
     for tool in config.get('python_tools', []):
-        tool['path'] = BASE_DIR / tool['path']
+        tool['path'] = (BASE_DIR / tool['path']).resolve()
     
     for app in config.get('dash_apps', []):
-        app['path'] = BASE_DIR / app['path']
+        app['path'] = (BASE_DIR / app['path']).resolve()
         # Build reverse_proxy config from YAML structure
         if 'reverse_proxy' in app:
             rp = app['reverse_proxy']
@@ -1213,7 +1213,7 @@ def create_self_panel():
                 ),
             ], className="mt-3"),
         ], className="p-3"),
-    ], className="gauge-panel military-panel mb-4", style={"position": "relative", "padding": "30px"})
+    ], className="gauge-panel military-panel self-panel mb-4", style={"position": "relative", "padding": "30px"})
 
 
 def _render_empty_panel(message):
