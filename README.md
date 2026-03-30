@@ -258,7 +258,7 @@ source .venv/bin/activate
 uv pip install -r control_panel_dist/requirements.txt
 ```
 
-See the [meta-repo QUICKSTART](../QUICKSTART.md) for full bootstrap and data migration instructions.
+See the [meta-repo QUICKSTART](../QUICKSTART.md) for bootstrap and setup instructions, and the [Developer Guide](../DEVELOPER_GUIDE.md) for data migration, virtual server tunnels, and submodule maintenance.
 
 ## Notes
 
