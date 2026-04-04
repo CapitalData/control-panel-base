@@ -16,3 +16,8 @@ arize-phoenix>=3.0.0
 opentelemetry-api>=1.0.0
 opentelemetry-sdk>=1.0.0
 opentelemetry-exporter-otlp-proto-http>=0.39.0
+# Documentation site (mkdocs serve via docs/serve_docs.py)
+mkdocs>=1.6.0
+mkdocs-material>=9.5.0
+pymdown-extensions>=10.0
+mkdocs-monorepo-plugin>=1.1.0

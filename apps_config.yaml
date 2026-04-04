@@ -17,7 +17,7 @@ python_tools:
 
   - id: kb-flow-analysis
     name: KanbanFlow Hours Analysis
-    path: finance_tracker/KB_Flow_analysis.ipynb
+    path: finance_tracker_app/KB_Flow_analysis.ipynb
     type: notebook
     description: Direct API pull of KanbanFlow hours → SQLite → Dash dashboard / Google Sheets sync
 
@@ -42,7 +42,7 @@ dash_apps:
 
   - id: finance-tracker
     name: Finance Tracker (finance_tracker_app.py)
-    path: finance_tracker/finance_tracker_app.py
+    path: finance_tracker_app/finance_tracker_app.py
     port: 8051
     description: Financial tracking and visualization dashboard — daily metrics, historical trends, Google Sheets integration
     reverse_proxy:
@@ -51,7 +51,7 @@ dash_apps:
 
   - id: invoice-tool
     name: Invoice Tool (invoice_tracker_app.py)
-    path: finance_tracker/invoice_tracker_app.py
+    path: finance_tracker_app/invoice_tracker_app.py
     port: 8049
     description: Invoice workflow manager — Drive integration, Invoice Manager, Job Manager, QuickBooks sync
     reverse_proxy:
@@ -60,7 +60,7 @@ dash_apps:
 
   - id: invoice-parser
     name: Invoice Parser
-    path: finance_tracker/invoice-parser/src/invoice_parser.py
+    path: finance_tracker_app/invoice-parser/src/invoice_parser.py
     port: 8070
     description: Parse PDF invoices with LLM extraction and export to Google Sheets
     reverse_proxy:
@@ -93,6 +93,15 @@ dash_apps:
     reverse_proxy:
       env_prefix: DAILY_USE_AGGREGATOR
       remote_port: 19052
+
+  - id: docs-server
+    name: ACD Docs Site
+    path: docs/serve_docs.py
+    port: 8055
+    description: Live MkDocs documentation site — unified manual for all ACD apps (auto-reloads on .md changes)
+    reverse_proxy:
+      env_prefix: DOCS_SERVER
+      remote_port: 19055
 
 # Panel Grouping - Controls which tab each tool/app appears in.
 # Each panel must have explicit tool_ids and dash_ids lists.
@@ -130,6 +139,7 @@ panel_groups:
     tab_id: manager-panel
     tool_ids: []
     dash_ids:
+      - docs-server
 
 
 # App Skins - Define visual themes for different personas.
@@ -253,6 +263,7 @@ personas:
       - ollama-chat
       - invoice-tool
       - daily-use-aggregator
+      - docs-server
 
   public_user:
     name: Public User

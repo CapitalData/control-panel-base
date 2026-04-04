@@ -2,6 +2,8 @@
 
 Use this README any time you need to rebuild or relocate the MkDocs-powered documentation for the Control Panel Command Station.
 
+> **Expanding to the whole meta-repo?** See [DEMO_documentation_withMKdocs.md](../../DEMO_documentation_withMKdocs.md) at the repo root for the full strategy: monorepo plugin, root `mkdocs.yml`, GitHub Actions workflow, and a nav tree covering all sub-apps.
+
 ## 1. Keep Docs with the Control Panel Repo
 
 1. Move `docs/`, `mkdocs.yml`, and `.github/workflows/mkdocs-deploy.yml` into the root of the Control Panel repository (`GUI_and_components/control_panel/`).

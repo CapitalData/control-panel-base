@@ -2,6 +2,9 @@
 
 > A teachable walkthrough that turns the existing Control Panel README into living documentation, deployable with MkDocs + GitHub Pages, and extensible to Docusaurus when you need a richer doc portal.
 
+!!! note "Expanding to the whole meta-repo?"
+    This guide covers the **Control Panel** app's standalone MkDocs site. For the strategy to unify all 60+ Markdown files across every sub-app in `acd-meta-repo` into a single live manual, see [DEMO_documentation_withMKdocs.md](../../DEMO_documentation_withMKdocs.md) at the repo root.
+
 ## 1. Map the Source Material
 
 1. **Inventory current assets**: collect the Control Panel README, persona notes, proxy env tables, and onboarding steps. Drop any supporting media (screenshots, diagrams) into `docs/assets/` so MkDocs can bundle them.
