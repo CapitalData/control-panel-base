@@ -222,6 +222,7 @@ personas:
       - ollama-llm
       - ollama-chat
       - invoice-tool
+      - learning-platform
 
   BDSG:
     name: BDSG
