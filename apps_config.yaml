@@ -58,6 +58,15 @@ dash_apps:
       env_prefix: INVOICE_PROCESSOR
       remote_port: 19053
 
+  - id: qb-invoice-sync
+    name: QB Invoice Sync
+    path: qb_invoice_sync/dash_tab/qb_sync_tab.py
+    port: 8071
+    description: Standalone QuickBooks Online invoice sync — OAuth status, stats, dry-run, and daemon controls
+    reverse_proxy:
+      env_prefix: QB_INVOICE_SYNC
+      remote_port: 19071
+
   - id: invoice-parser
     name: Invoice Parser
     path: finance_tracker_app/invoice-parser/src/invoice_parser.py
@@ -124,6 +133,7 @@ panel_groups:
       - kb-flow-analysis
     dash_ids:
       - invoice-parser
+      - qb-invoice-sync
       - finance-tracker
       - invoice-tool
 
