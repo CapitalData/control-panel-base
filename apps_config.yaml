@@ -77,10 +77,10 @@ dash_apps:
       remote_port: 19070
 
   - id: ollama-llm
-    name: ollama-llm Frontend
+    name: ollama-llm compute
     path: ollama_llm/app.py
     port: 11434
-    description: Ollama LLM Frontend
+    description: Ollama LLM Compute
     reverse_proxy:
       env_prefix: OLLAMA_LLM
       remote_port: 19053
@@ -233,21 +233,25 @@ personas:
       - ollama-chat
       - invoice-tool
       - learning-platform
+      - qb-invoice-sync
+      - daily-use-aggregator
+      - docs-server
 
-  BDSG:
-    name: BDSG
-    skin: default
-    allowed_tools:
-      - invoice-generation
-      - kb-flow-analysis
-    allowed_dash_apps:
-      - phoenix-arize
-      - finance-tracker
-      - invoice-parser
-      - dash-cards
-      - ollama-llm
-      - ollama-chat
-      - invoice-tool
+
+  # BDSG:
+  #   name: BDSG
+  #   skin: default
+  #   allowed_tools:
+  #     - invoice-generation
+  #     - kb-flow-analysis
+  #   allowed_dash_apps:
+  #     - phoenix-arize
+  #     - finance-tracker
+  #     - invoice-parser
+  #     - dash-cards
+  #     - ollama-llm
+  #     - ollama-chat
+  #     - invoice-tool
 
   developer:
     name: Developer
@@ -260,29 +264,29 @@ personas:
       - ollama-chat
       - learning-platform
 
-  management:
-    name: Management
-    skin: management
-    description: Operations & reporting overview
-    allowed_tools:
-      - invoice-generation
-    allowed_dash_apps:
-      - phoenix-arize
-      - finance-tracker
-      - invoice-parser
-      - ollama-llm
-      - ollama-chat
-      - invoice-tool
-      - daily-use-aggregator
-      - docs-server
+  # management:
+  #   name: Management
+  #   skin: management
+  #   description: Operations & reporting overview
+  #   allowed_tools:
+  #     - invoice-generation
+  #   allowed_dash_apps:
+  #     - phoenix-arize
+  #     - finance-tracker
+  #     - invoice-parser
+  #     - ollama-llm
+  #     - ollama-chat
+  #     - invoice-tool
+  #     - daily-use-aggregator
+  #     - docs-server
 
-  public_user:
-    name: Public User
-    skin: titanium
-    allowed_tools: []
-    allowed_dash_apps:
-      - phoenix-arize
-      - invoice-parser
-      - ollama-llm
-      - ollama-chat
+  # public_user:
+  #   name: Public User
+  #   skin: titanium
+  #   allowed_tools: []
+  #   allowed_dash_apps:
+  #     - phoenix-arize
+  #     - invoice-parser
+  #     - ollama-llm
+  #     - ollama-chat
       
