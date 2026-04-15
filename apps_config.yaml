@@ -66,6 +66,10 @@ dash_apps:
     reverse_proxy:
       env_prefix: QB_INVOICE_SYNC
       remote_port: 19071
+    webhook:
+      path_env: QB_WEBHOOK_PATH
+      default_path: /qb-webhook
+      description: Intuit webhook receiver — listens for paid-invoice notifications and updates the Google Sheet in real time
 
   - id: invoice-parser
     name: Invoice Parser
