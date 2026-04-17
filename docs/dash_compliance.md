@@ -6,7 +6,7 @@ This document describes the Dash API changes relevant to all apps in this meta-r
 
 ## Issue Summary (Audit Results — March 2026)
 
-All issues below were found and fixed across the codebase to ensure consistent behaviour with the control panel's shared virtual environment (Dash ≥ 2.17.0, presently at 3.3.0).
+All issues below were found and fixed across the codebase to ensure consistent behaviour with the control panel's shared virtual environment (Dash ≥ 2.17.0, presently at 4.1.0).
 
 | File | Issue | Fix Applied |
 |---|---|---|
@@ -38,7 +38,7 @@ All issues below were found and fixed across the codebase to ensure consistent b
 
 | Category | Old Pattern | New Pattern | Notes |
 |---|---|---|---|
-| **App launch** | `app.run_server(debug=True)` | `app.run(debug=True)` | `run_server()` is a deprecated alias; removed in future versions |
+| **App launch** | `app.run_server(debug=True)` | `app.run(debug=True)` | `run_server()` removed in Dash 4.0 |
 | **Callback context** | `from dash import callback_context` or `callback_context as ctx` | `from dash import ctx` | `callback_context` deprecated since Dash 2.0 |
 | **Callback decorator** | `@app.callback(...)` | `from dash import callback` → `@callback(...)` | Standalone decorator removes coupling to the app instance |
 | **DataTable import** | `pip install dash-table` / `from dash_table import DataTable` | `from dash.dash_table import DataTable` | `dash-table` merged into `dash` since 2.x; no separate package needed |

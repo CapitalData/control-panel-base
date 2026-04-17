@@ -12,7 +12,7 @@ Technical Notes:
 
 - Each managed app must handle WERKZEUG_RUN_MAIN='true' to disable hot-reload:
     use_reloader = os.environ.get('WERKZEUG_RUN_MAIN') != 'true'
-    app.run_server(..., use_reloader=use_reloader)
+    app.run(..., use_reloader=use_reloader)
 
 - This control panel runs on port 8060
 - Status updates are configurable via CONTROL_PANEL_STATUS_INTERVAL_MS

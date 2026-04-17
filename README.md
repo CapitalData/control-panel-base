@@ -150,7 +150,7 @@ import os  # Make sure os is imported
 if __name__ == "__main__":
     # Disable debug mode entirely if running from control panel
     from_control_panel = os.environ.get('LAUNCHED_FROM_CONTROL_PANEL') == 'true'
-    app.run_server(
+    app.run(
         debug=not from_control_panel,  # Disable debug when from control panel
         port=8050  # or appropriate port
 ```
