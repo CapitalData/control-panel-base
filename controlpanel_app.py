@@ -48,6 +48,13 @@ from pathlib import Path
 import json
 import psutil
 import yaml
+from dotenv import load_dotenv
+
+# Load .env from the meta-repo root (one level above control_panel_base/)
+_meta_repo_root = Path(__file__).resolve().parent.parent
+_dotenv_path = _meta_repo_root / ".env"
+if _dotenv_path.is_file():
+    load_dotenv(_dotenv_path, override=False)
 
 import dash
 import dash_bootstrap_components as dbc
