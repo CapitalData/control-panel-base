@@ -21,6 +21,18 @@ python_tools:
     type: notebook
     description: Direct API pull of KanbanFlow hours → SQLite → Dash dashboard / Google Sheets sync
 
+  - id: data-capture-ai-triage
+    name: AI Conversation Triage
+    path: data_capture/ai-conversation-triage.html
+    type: web
+    description: Browser-based AI conversation triage and markdown export utility
+
+  - id: data-capture-email-triage
+    name: Email Triage UI
+    path: data_capture/email_triage.html
+    type: web
+    description: Browser-based email triage interface backed by the local Email Triage server
+
 dash_apps:
   - id: phoenix-arize
     name: Phoenix/Arize Traces
@@ -116,6 +128,12 @@ dash_apps:
       env_prefix: DOCS_SERVER
       remote_port: 19055
 
+  - id: data-capture-email-server
+    name: Email Triage Server
+    path: data_capture/email_server.py
+    port: 5050
+    description: Local Flask IMAP bridge service used by the Email Triage web app
+
 # Panel Grouping - Controls which tab each tool/app appears in.
 # Each panel must have explicit tool_ids and dash_ids lists.
 # Ordering within each list determines card render order.
@@ -144,10 +162,13 @@ panel_groups:
   daily:
     label: "🗂️ DAILY TOOLS"
     tab_id: daily-panel
-    tool_ids: []
+    tool_ids:
+      - data-capture-ai-triage
+      - data-capture-email-triage
     dash_ids:
       - daily-use-aggregator
       - learning-platform
+      - data-capture-email-server
   manager:
     label: "📋 MANAGER TOOLS"
     tab_id: manager-panel
@@ -228,6 +249,8 @@ personas:
     allowed_tools:
       - invoice-generation
       - kb-flow-analysis
+      - data-capture-ai-triage
+      - data-capture-email-triage
     allowed_dash_apps:
       - phoenix-arize
       - finance-tracker
@@ -240,6 +263,7 @@ personas:
       - qb-invoice-sync
       - daily-use-aggregator
       - docs-server
+      - data-capture-email-server
 
 
   # BDSG:
@@ -260,13 +284,16 @@ personas:
   developer:
     name: Developer
     skin: dark
-    allowed_tools: []
+    allowed_tools:
+      - data-capture-ai-triage
+      - data-capture-email-triage
     allowed_dash_apps:
       - phoenix-arize
       - invoice-parser
       - ollama-llm
       - ollama-chat
       - learning-platform
+      - data-capture-email-server
 
   # management:
   #   name: Management

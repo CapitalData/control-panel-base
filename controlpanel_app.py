@@ -491,6 +491,21 @@ def start_python_tool(tool_id, extra_env=None):
             app_status[tool_id] = "stopped"  # notebook viewer manages its own process
             return True, "Notebook opened"
 
+        if tool["type"] in {"web", "html", "url"}:
+            target = str(tool["path"])
+            parsed = target.lower()
+            if parsed.startswith("http://") or parsed.startswith("https://"):
+                webbrowser.open(target)
+                opener = "browser"
+            else:
+                subprocess.Popen(["open", target], close_fds=True)
+                opener = "default app"
+            app_outputs[tool_id] = [
+                f"[{datetime.now().strftime('%H:%M:%S')}] Opened {tool['name']} in {opener}"
+            ]
+            app_status[tool_id] = "stopped"  # browser manages its own process
+            return True, "Web app opened"
+
         env = os.environ.copy()
         if extra_env:
             env.update(extra_env)
