@@ -134,6 +134,12 @@ dash_apps:
     port: 5050
     description: Local Flask IMAP bridge service used by the Email Triage web app
 
+  - id: copilot-model-usage
+    name: Copilot Model Usage Dashboard
+    path: data_capture/copilot_model_usage_dash.py
+    port: 8091
+    description: Visualize local Copilot Chat model usage from debug log files
+
 # Panel Grouping - Controls which tab each tool/app appears in.
 # Each panel must have explicit tool_ids and dash_ids lists.
 # Ordering within each list determines card render order.
@@ -146,6 +152,7 @@ panel_groups:
       - phoenix-arize
       - ollama-llm
       - ollama-chat
+      - copilot-model-usage
     project_name: default
 
   finance:
@@ -264,6 +271,7 @@ personas:
       - daily-use-aggregator
       - docs-server
       - data-capture-email-server
+      - copilot-model-usage
 
 
   # BDSG:
@@ -294,6 +302,7 @@ personas:
       - ollama-chat
       - learning-platform
       - data-capture-email-server
+      - copilot-model-usage
 
   # management:
   #   name: Management
