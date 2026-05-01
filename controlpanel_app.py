@@ -111,7 +111,7 @@ def build_proxy_config(prefix, *, defaults=None):
         "user": os.environ.get(f"{base}_PROXY_USER", defaults.get("user")),
         "remote_port": env_int(f"{base}_PROXY_REMOTE_PORT", defaults.get("remote_port")),
         "bind_address": os.environ.get(
-            f"{base}_PROXY_BIND", defaults.get("bind_address", "0.0.0.0")
+            f"{base}_PROXY_BIND", defaults.get("bind_address", "127.0.0.1")
         ),
         "ssh_key_path": os.environ.get(
             f"{base}_PROXY_KEY_PATH", defaults.get("ssh_key_path")
@@ -126,7 +126,7 @@ def build_proxy_config(prefix, *, defaults=None):
             f"{base}_PROXY_HEALTH_INTERVAL", defaults.get("healthcheck_interval", 30)
         ),
         "healthcheck_timeout": env_float(
-            f"{base}_PROXY_HEALTH_TIMEOUT", defaults.get("healthcheck_timeout", 2.0)
+            f"{base}_PROXY_HEALTH_TIMEOUT", defaults.get("healthcheck_timeout", 5.0)
         ),
         "healthcheck_enabled": env_bool(
             f"{base}_PROXY_HEALTH_ENABLED", defaults.get("healthcheck_enabled", True)

@@ -99,7 +99,7 @@ dash_apps:
     description: Ollama LLM Compute
     reverse_proxy:
       env_prefix: OLLAMA_LLM
-      remote_port: 19053
+      remote_port: 19056
 
   - id: ollama-chat
     name: Ollama Chat UI
