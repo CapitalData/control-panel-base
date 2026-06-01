@@ -174,7 +174,7 @@ def _find_pids_listening_on_port(port):
             if pid is None:
                 continue
             try:
-                for conn in proc.connections(kind='inet'):
+                for conn in proc.net_connections(kind='inet'):
                     laddr = getattr(conn, "laddr", None)
                     if not laddr:
                         continue
@@ -553,7 +553,7 @@ def start_dash_app(app_id, extra_env=None):
         allow_port_in_use = app_id in {"ollama-llm", "phoenix-arize"}
         for proc in psutil.process_iter(['pid', 'name']):
             try:
-                for conn in proc.connections():
+                for conn in proc.net_connections(kind='inet'):
                     if conn.laddr.port == app_config["port"]:
                         if allow_port_in_use:
                             app_outputs.setdefault(app_id, [])
