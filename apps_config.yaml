@@ -17,7 +17,7 @@ python_tools:
 
   - id: kb-flow-analysis
     name: KanbanFlow Hours Analysis
-    path: finance_tracker_app/KB_Flow_analysis.ipynb
+    path: finance_tracker_app/KB_Flow_analysis_lean.ipynb
     type: notebook
     description: Direct API pull of KanbanFlow hours → SQLite → Dash dashboard / Google Sheets sync
 
