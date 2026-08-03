@@ -318,8 +318,11 @@ if DEFAULT_PERSONA_ID not in PERSONAS:
 ALLOW_PERSONA_SWITCH = env_bool("CONTROL_PANEL_ALLOW_PERSONA_SWITCH", True)
 STATUS_UPDATE_INTERVAL_MS = max(
     1000,
-    env_int("CONTROL_PANEL_STATUS_INTERVAL_MS", 5000) or 5000,
+    env_int("CONTROL_PANEL_STATUS_INTERVAL_MS", 8000) or 8000,
 )
+CONTROL_PANEL_DEBUG = env_bool("CONTROL_PANEL_DEBUG", True)
+CONTROL_PANEL_USE_RELOADER = env_bool("CONTROL_PANEL_USE_RELOADER", False)
+CONTROL_PANEL_THREADED = env_bool("CONTROL_PANEL_THREADED", True)
 
 PERSONA_OPTIONS = [
     {"label": data["name"], "value": persona_id}
@@ -1779,4 +1782,9 @@ if __name__ == "__main__":
     _add_self_log(f"\U0001f39b\ufe0f  Control Panel starting \u2014 PID {os.getpid()} on http://localhost:8060")
     print("🎛️  Control Panel starting on http://localhost:8060")
     print("=" * 50)
-    app.run(debug=True, port=8060)
+    app.run(
+        debug=CONTROL_PANEL_DEBUG,
+        port=8060,
+        use_reloader=CONTROL_PANEL_USE_RELOADER,
+        threaded=CONTROL_PANEL_THREADED,
+    )
