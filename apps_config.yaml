@@ -61,6 +61,15 @@ dash_apps:
       env_prefix: FINANCE_TRACKER
       remote_port: 19051
 
+  - id: entity-dependency-graph
+    name: Entity Dependency Graph
+    path: finance_tracker_app/entity_dependency_graph_app.py
+    port: 8056
+    description: Drag-and-drop graph editor seeded from Google Sheets tabs tables/documents/entities/data
+    reverse_proxy:
+      env_prefix: ENTITY_DEP_GRAPH
+      remote_port: 19056
+
   - id: invoice-tool
     name: Invoice Tool (invoice_tracker_app.py)
     path: finance_tracker_app/invoice_tracker_app.py
@@ -164,6 +173,7 @@ panel_groups:
       - invoice-parser
       - qb-invoice-sync
       - finance-tracker
+      - entity-dependency-graph
       - invoice-tool
 
   daily:
