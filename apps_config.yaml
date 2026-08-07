@@ -271,6 +271,7 @@ personas:
     allowed_dash_apps:
       - phoenix-arize
       - finance-tracker
+      - entity-dependency-graph
       - invoice-parser
       - dash-cards
       - ollama-llm
@@ -307,6 +308,7 @@ personas:
       - data-capture-email-triage
     allowed_dash_apps:
       - phoenix-arize
+      - entity-dependency-graph
       - invoice-parser
       - ollama-llm
       - ollama-chat
