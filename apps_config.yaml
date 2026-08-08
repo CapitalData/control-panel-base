@@ -92,6 +92,15 @@ dash_apps:
       env_prefix: INVOICE_PARSER
       remote_port: 19070
 
+  - id: finance-entity-graph
+    name: Finance Entity Dependency Graph
+    path: finance_tracker_app/entity_dependency_graph_app.py
+    port: 8056
+    description: Interactive entity and dependency graph editor backed by Google Sheets
+    reverse_proxy:
+      env_prefix: FINANCE_ENTITY_GRAPH
+      remote_port: 19057
+
   - id: ollama-llm
     name: ollama-llm compute
     path: ollama_llm/app.py
@@ -165,6 +174,7 @@ panel_groups:
       - qb-invoice-sync
       - finance-tracker
       - invoice-tool
+      - finance-entity-graph
 
   daily:
     label: "🗂️ DAILY TOOLS"
@@ -262,6 +272,7 @@ personas:
       - phoenix-arize
       - finance-tracker
       - invoice-parser
+      - finance-entity-graph
       - dash-cards
       - ollama-llm
       - ollama-chat
