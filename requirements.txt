@@ -1,5 +1,6 @@
 dash>=2.17.0
 dash-bootstrap-components>=1.5.0
+dash-cytoscape>=1.0.2
 psutil>=5.9.0
 pyyaml>=6.0
 pandas>=2.0.0

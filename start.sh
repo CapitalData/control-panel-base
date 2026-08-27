@@ -28,7 +28,7 @@ source "$SCRIPT_DIR/venv/bin/activate"
 
 # Check if dependencies are installed
 echo "Checking dependencies..."
-if python -c "import dash, dash_bootstrap_components, psutil, yaml" 2>/dev/null; then
+if python -c "import dash, dash_bootstrap_components, dash_cytoscape, psutil, yaml" 2>/dev/null; then
     echo "✅ All dependencies installed"
 else
     echo "📦 Installing dependencies..."
