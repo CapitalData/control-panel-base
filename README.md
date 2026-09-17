@@ -214,6 +214,8 @@ If the Invoice Tool shows demo/empty data, use the reconnect guide:
 - **Dash Cards Frontend** (port 8052) - Card-based UI components
 - **Ollama LLM Frontend** (port 11434) - SciOps cockpit to drive the local Ollama stack
 
+If the Learning Platform needs a manual restart after a configuration change, stop its port-8050 listener before starting it again. Use the cross-platform procedure in [learning_platform/README.md](../learning_platform/README.md#restarting-the-local-app); it includes Bash instructions for macOS/Linux/WSL and PowerShell instructions for native Windows.
+
 ## Usage
 
 ```bash
