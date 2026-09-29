@@ -193,6 +193,11 @@ panel_groups:
     dash_ids:
       - docs-server
 
+  gaming:
+    label: "🎮 GAMING PANEL"
+    tab_id: gaming-panel
+    tool_ids: []
+    dash_ids: []
 
 # App Skins - Define visual themes for different personas.
 # css_class: the CSS class applied to .persona-wrapper when this skin is active.
