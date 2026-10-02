@@ -33,6 +33,24 @@ python_tools:
     type: web
     description: Browser-based email triage interface backed by the local Email Triage server
 
+  - id: portal-scrape-demo
+    name: Portal Scraper Demo
+    path: portal_ingest/portal_scraper_demo.py
+    type: script
+    description: Demo portal scrape that logs in, downloads PDFs, and writes a normalized manifest
+
+  - id: portal-parser-demo
+    name: Portal Parser Demo
+    path: portal_parser_demo/portal_parser_demo.py
+    type: script
+    description: Demo parser that normalizes portal snapshot rows for Sheets, database export, and follow-on parsing
+
+  - id: google-sheets-exporter
+    name: Google Sheets Exporter
+    path: google_sheet_exporter/google_sheet_exporter.py
+    type: script
+    description: Append normalized portal rows to an existing Google Sheet with optional overwrite mode
+
 dash_apps:
   - id: phoenix-arize
     name: Phoenix/Arize Traces
@@ -182,6 +200,9 @@ panel_groups:
     tool_ids:
       - data-capture-ai-triage
       - data-capture-email-triage
+      - portal-scrape-demo
+      - portal-parser-demo
+      - google-sheets-exporter
     dash_ids:
       - daily-use-aggregator
       - learning-platform
