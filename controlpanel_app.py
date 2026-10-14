@@ -454,6 +454,145 @@ def build_observability_env(project_name):
     """Environment variables that tag traces to a Phoenix project."""
     return {"PHOENIX_PROJECT_NAME": sanitize_project_name(project_name)}
 
+
+def _clean_env_value(value):
+    """Normalize optional text inputs before sending them to child env vars."""
+    if value is None:
+        return ""
+    return str(value).strip()
+
+
+def _portal_default_sink_root():
+    """Resolve a default sink directory for portal scraper output."""
+    return os.environ.get("PORTAL_SCRAPE_SINK_DIR") or str((BASE_DIR / "portal_downloads").resolve())
+
+
+def _portal_default_sheet_fields():
+    """Default field order used for portal metadata export."""
+    return os.environ.get(
+        "PORTAL_SHEET_FIELDS",
+        "document_id,title,client,date,status,pdf_url,pdf_name,notes",
+    )
+
+
+PORTAL_SHEET_FIELD_PRESETS = {
+    "full": [
+        "document_id",
+        "title",
+        "client",
+        "date",
+        "status",
+        "pdf_url",
+        "pdf_name",
+        "notes",
+    ],
+    "finance": [
+        "document_id",
+        "client",
+        "date",
+        "status",
+        "pdf_name",
+        "pdf_url",
+        "notes",
+    ],
+    "minimal": [
+        "document_id",
+        "title",
+        "status",
+        "pdf_url",
+        "pdf_name",
+    ],
+}
+
+
+def _sheet_fields_to_text(fields):
+    """Render a sheet field list as comma-delimited text for textarea display."""
+    return ",".join(fields)
+
+
+def _parse_sheet_fields(sheet_fields_value):
+    """Parse comma/newline-delimited field names into a normalized list."""
+    raw_text = _clean_env_value(sheet_fields_value)
+    if not raw_text:
+        return []
+    tokens = []
+    for chunk in raw_text.replace("\n", ",").split(","):
+        field = chunk.strip()
+        if field:
+            tokens.append(field)
+    # De-duplicate while preserving order.
+    unique = []
+    seen = set()
+    for field in tokens:
+        if field in seen:
+            continue
+        unique.append(field)
+        seen.add(field)
+    return unique
+
+
+def _resolve_sheet_field_preset(preset_name):
+    """Resolve preset name to a comma-delimited field mapping text."""
+    fields = PORTAL_SHEET_FIELD_PRESETS.get((preset_name or "").strip().lower())
+    if not fields:
+        return _portal_default_sheet_fields()
+    return _sheet_fields_to_text(fields)
+
+
+def build_portal_scrape_env(
+    *,
+    site_url,
+    login_url,
+    listing_url,
+    username,
+    password,
+    sink_root,
+    demo_html,
+    export_to_sheets,
+    spreadsheet_id,
+    worksheet_name,
+    service_account_file,
+    sheet_fields,
+):
+    """Build a scrubbed env payload for the portal scraper run."""
+    env_payload = {
+        "PORTAL_SITE_URL": _clean_env_value(site_url),
+        "PORTAL_LOGIN_URL": _clean_env_value(login_url),
+        "PORTAL_LISTING_URL": _clean_env_value(listing_url),
+        "PORTAL_USERNAME": _clean_env_value(username),
+        "PORTAL_PASSWORD": _clean_env_value(password),
+        "PORTAL_SCRAPE_SINK_DIR": _clean_env_value(sink_root) or _portal_default_sink_root(),
+        "PORTAL_DEMO_HTML": _clean_env_value(demo_html),
+        "PORTAL_EXPORT_TO_SHEETS": "1" if bool(export_to_sheets) else "0",
+        "PORTAL_SPREADSHEET_ID": _clean_env_value(spreadsheet_id),
+        "PORTAL_WORKSHEET_NAME": _clean_env_value(worksheet_name) or "PortalData",
+        "GOOGLE_SERVICE_ACCOUNT_FILE": _clean_env_value(service_account_file),
+        "PORTAL_SHEET_FIELDS": ",".join(_parse_sheet_fields(sheet_fields)),
+    }
+    # Empty values should not overwrite parent env values.
+    return {key: value for key, value in env_payload.items() if value}
+
+
+def validate_portal_scrape_inputs(
+    username,
+    password,
+    listing_url,
+    demo_html,
+    export_to_sheets,
+    spreadsheet_id,
+    sheet_fields,
+):
+    """Return a validation message if required portal scraper fields are missing."""
+    if not _clean_env_value(username) or not _clean_env_value(password):
+        return "Username and password are required."
+    if not _clean_env_value(listing_url) and not _clean_env_value(demo_html):
+        return "Provide either a Listing URL (live scrape) or a Demo HTML file path."
+    if bool(export_to_sheets) and not _clean_env_value(spreadsheet_id):
+        return "Spreadsheet ID is required when Google Sheets export is enabled."
+    if bool(export_to_sheets) and not _parse_sheet_fields(sheet_fields):
+        return "At least one sheet field is required when Google Sheets export is enabled."
+    return ""
+
 def read_output(process, app_id):
     """Read process output in a separate thread"""
     try:
@@ -468,7 +607,7 @@ def read_output(process, app_id):
     except Exception as e:
         app_outputs[app_id].append(f"[ERROR] {str(e)}")
 
-def start_python_tool(tool_id, extra_env=None):
+def start_python_tool(tool_id, extra_env=None, extra_args=None):
     """Start a Python tool"""
     tool = next((t for t in PYTHON_TOOLS if t["id"] == tool_id), None)
     if not tool:
@@ -512,9 +651,12 @@ def start_python_tool(tool_id, extra_env=None):
         env = os.environ.copy()
         if extra_env:
             env.update(extra_env)
+        command = [sys.executable, str(tool["path"])]
+        if extra_args:
+            command.extend(extra_args)
         
         process = subprocess.Popen(
-            [sys.executable, str(tool["path"])],
+            command,
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,
             cwd=tool["path"].parent,
@@ -883,6 +1025,186 @@ def create_screw():
 
 def create_tool_card(tool):
     """Create a military-style gauge panel for a Python tool"""
+    portal_controls = []
+    if tool["id"] == "portal-scrape-demo":
+        portal_controls = [
+            html.Div(className="warning-stripe mt-3 mb-3"),
+            html.Div([
+                html.Span("PORTAL SCRAPER CREDENTIALS", className="status-text"),
+                html.Small(
+                    "Credentials are used for this run only and are not written to disk by the control panel.",
+                    style={"display": "block", "color": "#8ba3ad", "fontSize": "11px", "marginTop": "6px"},
+                ),
+            ]),
+            dbc.Row([
+                dbc.Col(
+                    dbc.Input(
+                        id="portal-site-url-input",
+                        value=os.environ.get("PORTAL_SITE_URL", ""),
+                        placeholder="Site URL (example: https://portal.example.com)",
+                        type="text",
+                        size="sm",
+                    ),
+                    width=6,
+                ),
+                dbc.Col(
+                    dbc.Input(
+                        id="portal-login-url-input",
+                        value=os.environ.get("PORTAL_LOGIN_URL", ""),
+                        placeholder="Login URL",
+                        type="text",
+                        size="sm",
+                    ),
+                    width=6,
+                ),
+            ], className="g-2 mt-1"),
+            dbc.Row([
+                dbc.Col(
+                    dbc.Input(
+                        id="portal-listing-url-input",
+                        value=os.environ.get("PORTAL_LISTING_URL", ""),
+                        placeholder="Listing URL (live scrape source page)",
+                        type="text",
+                        size="sm",
+                    ),
+                    width=12,
+                ),
+            ], className="g-2 mt-1"),
+            dbc.Row([
+                dbc.Col(
+                    dbc.Input(
+                        id="portal-username-input",
+                        value=os.environ.get("PORTAL_USERNAME", ""),
+                        placeholder="Portal username",
+                        type="text",
+                        size="sm",
+                    ),
+                    width=6,
+                ),
+                dbc.Col(
+                    dbc.Input(
+                        id="portal-password-input",
+                        value="",
+                        placeholder="Portal password",
+                        type="password",
+                        size="sm",
+                    ),
+                    width=6,
+                ),
+            ], className="g-2 mt-1"),
+            dbc.Row([
+                dbc.Col(
+                    dbc.Input(
+                        id="portal-sink-root-input",
+                        value=_portal_default_sink_root(),
+                        placeholder="Output folder for PDFs and manifest",
+                        type="text",
+                        size="sm",
+                    ),
+                    width=8,
+                ),
+                dbc.Col(
+                    dbc.Input(
+                        id="portal-demo-html-input",
+                        value=os.environ.get("PORTAL_DEMO_HTML", ""),
+                        placeholder="Demo HTML path (optional)",
+                        type="text",
+                        size="sm",
+                    ),
+                    width=4,
+                ),
+            ], className="g-2 mt-1"),
+            dbc.Row([
+                dbc.Col(
+                    dbc.Switch(
+                        id="portal-export-to-sheets-switch",
+                        value=True,
+                        className="mb-0",
+                    ),
+                    width=2,
+                ),
+                dbc.Col(
+                    html.Div("Export metadata to Google Sheets", className="status-text mt-1"),
+                    width=10,
+                ),
+            ], className="g-2 mt-2"),
+            dbc.Row([
+                dbc.Col(
+                    dbc.Input(
+                        id="portal-spreadsheet-id-input",
+                        value=os.environ.get("PORTAL_SPREADSHEET_ID", ""),
+                        placeholder="Google Spreadsheet ID",
+                        type="text",
+                        size="sm",
+                    ),
+                    width=8,
+                ),
+                dbc.Col(
+                    dbc.Input(
+                        id="portal-worksheet-name-input",
+                        value=os.environ.get("PORTAL_WORKSHEET_NAME", "PortalData"),
+                        placeholder="Worksheet tab name",
+                        type="text",
+                        size="sm",
+                    ),
+                    width=4,
+                ),
+            ], className="g-2 mt-1"),
+            dbc.Row([
+                dbc.Col(
+                    dbc.Input(
+                        id="portal-service-account-file-input",
+                        value=os.environ.get("GOOGLE_SERVICE_ACCOUNT_FILE", ""),
+                        placeholder="Google service account JSON file path (optional)",
+                        type="text",
+                        size="sm",
+                    ),
+                    width=12,
+                ),
+            ], className="g-2 mt-1"),
+            dbc.Row([
+                dbc.Col(
+                    dbc.Select(
+                        id="portal-sheet-preset-select",
+                        value="full",
+                        options=[
+                            {"label": "Full (default)", "value": "full"},
+                            {"label": "Finance", "value": "finance"},
+                            {"label": "Minimal", "value": "minimal"},
+                        ],
+                    ),
+                    width=12,
+                ),
+            ], className="g-2 mt-1"),
+            dbc.Row([
+                dbc.Col(
+                    dbc.Textarea(
+                        id="portal-sheet-fields-input",
+                        value=_portal_default_sheet_fields(),
+                        placeholder="Sheet fields (comma or newline separated)",
+                        style={"minHeight": "78px", "fontFamily": "'Courier New', monospace", "fontSize": "11px"},
+                    ),
+                    width=12,
+                ),
+            ], className="g-2 mt-1"),
+            dbc.Row([
+                dbc.Col([
+                    dbc.Button(
+                        "RUN SCRAPE",
+                        id="portal-run-scrape",
+                        color="success",
+                        size="sm",
+                        className="w-100 mt-2",
+                    ),
+                    html.Div(
+                        id="portal-run-status",
+                        className="status-text mt-2",
+                        style={"minHeight": "18px", "color": "#8ba3ad"},
+                    ),
+                ], width=12),
+            ], className="g-2"),
+        ]
+
     return html.Div([
         # Corner screws
         html.Div(className="screw screw-tl"),
@@ -941,6 +1263,8 @@ def create_tool_card(tool):
             
             # Warning stripe
             html.Div(className="warning-stripe mt-3"),
+
+            *portal_controls,
 
             dbc.Row([
                 dbc.Col([
@@ -1509,6 +1833,16 @@ def update_persona_view(selected_persona):
 
 
 @callback(
+    Output("portal-sheet-fields-input", "value"),
+    Input("portal-sheet-preset-select", "value"),
+    prevent_initial_call=True,
+)
+def apply_portal_sheet_field_preset(selected_preset):
+    """Apply one-click field mapping presets for portal Sheets export."""
+    return _resolve_sheet_field_preset(selected_preset)
+
+
+@callback(
     Output({"type": "tool-collapse", "index": MATCH}, "is_open"),
     Output({"type": "tool-indicator", "index": MATCH}, "style"),
     Output({"type": "tool-output", "index": MATCH}, "children"),
@@ -1569,6 +1903,110 @@ def handle_python_tool(checked, kill_clicks, n, tool_id_dict, project_name):
     }
     
     return checked and True, indicator_style, output_text
+
+
+@callback(
+    Output("portal-run-status", "children"),
+    Input("portal-run-scrape", "n_clicks"),
+    State("portal-site-url-input", "value"),
+    State("portal-login-url-input", "value"),
+    State("portal-listing-url-input", "value"),
+    State("portal-username-input", "value"),
+    State("portal-password-input", "value"),
+    State("portal-sink-root-input", "value"),
+    State("portal-demo-html-input", "value"),
+    State("portal-export-to-sheets-switch", "value"),
+    State("portal-spreadsheet-id-input", "value"),
+    State("portal-worksheet-name-input", "value"),
+    State("portal-service-account-file-input", "value"),
+    State("portal-sheet-fields-input", "value"),
+    State("phoenix-project-name", "data"),
+    prevent_initial_call=True,
+)
+def run_portal_scraper_from_panel(
+    n_clicks,
+    site_url,
+    login_url,
+    listing_url,
+    username,
+    password,
+    sink_root,
+    demo_html,
+    export_to_sheets,
+    spreadsheet_id,
+    worksheet_name,
+    service_account_file,
+    sheet_fields,
+    project_name,
+):
+    """Run the portal scraper with runtime credentials provided in the panel."""
+    if not n_clicks:
+        return no_update
+
+    validation_error = validate_portal_scrape_inputs(
+        username=username,
+        password=password,
+        listing_url=listing_url,
+        demo_html=demo_html,
+        export_to_sheets=export_to_sheets,
+        spreadsheet_id=spreadsheet_id,
+        sheet_fields=sheet_fields,
+    )
+    if validation_error:
+        return validation_error
+
+    if app_processes.get("portal-scrape-demo") and app_processes["portal-scrape-demo"].poll() is None:
+        return "Portal scraper is already running."
+
+    scrape_env = build_portal_scrape_env(
+        site_url=site_url,
+        login_url=login_url,
+        listing_url=listing_url,
+        username=username,
+        password=password,
+        sink_root=sink_root,
+        demo_html=demo_html,
+        export_to_sheets=export_to_sheets,
+        spreadsheet_id=spreadsheet_id,
+        worksheet_name=worksheet_name,
+        service_account_file=service_account_file,
+        sheet_fields=sheet_fields,
+    )
+    merged_env = build_observability_env(project_name)
+    merged_env.update(scrape_env)
+
+    config_path = str((BASE_DIR / "portal_ingest" / "demo_config.yaml").resolve())
+    sink_root_clean = _clean_env_value(sink_root) or _portal_default_sink_root()
+    run_args = ["--source-config", config_path, "--sink-root", sink_root_clean]
+
+    success, message = start_python_tool(
+        "portal-scrape-demo",
+        extra_env=merged_env,
+        extra_args=run_args,
+    )
+    if success:
+        app_outputs.setdefault("portal-scrape-demo", [])
+        app_outputs["portal-scrape-demo"].append(
+            f"[{datetime.now().strftime('%H:%M:%S')}] Triggered portal scrape from Control Panel"
+        )
+        if len(app_outputs["portal-scrape-demo"]) > 100:
+            app_outputs["portal-scrape-demo"] = app_outputs["portal-scrape-demo"][-100:]
+        if export_to_sheets:
+            worksheet_label = _clean_env_value(worksheet_name) or "PortalData"
+            selected_fields = _parse_sheet_fields(sheet_fields)
+            return (
+                f"Scrape started. Output folder: {sink_root_clean}. "
+                f"Sheets export enabled to worksheet '{worksheet_label}' with {len(selected_fields)} fields."
+            )
+        return f"Scrape started. Output folder: {sink_root_clean}. Sheets export disabled."
+
+    app_outputs.setdefault("portal-scrape-demo", [])
+    app_outputs["portal-scrape-demo"].append(
+        f"[{datetime.now().strftime('%H:%M:%S')}] [ERROR] {message}"
+    )
+    if len(app_outputs["portal-scrape-demo"]) > 100:
+        app_outputs["portal-scrape-demo"] = app_outputs["portal-scrape-demo"][-100:]
+    return f"Failed to start scraper: {message}"
 
 @callback(
     Output({"type": "dash-collapse", "index": MATCH}, "is_open"),

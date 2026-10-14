@@ -294,6 +294,9 @@ personas:
       - kb-flow-analysis
       - data-capture-ai-triage
       - data-capture-email-triage
+      - portal-scrape-demo
+      - portal-parser-demo
+      - google-sheets-exporter
     allowed_dash_apps:
       - phoenix-arize
       - finance-tracker
@@ -332,6 +335,9 @@ personas:
     allowed_tools:
       - data-capture-ai-triage
       - data-capture-email-triage
+      - portal-scrape-demo
+      - portal-parser-demo
+      - google-sheets-exporter
     allowed_dash_apps:
       - phoenix-arize
       - invoice-parser

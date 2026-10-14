@@ -233,6 +233,50 @@ Then open: http://localhost:8060
 4. For Dash apps, click "▶ LAUNCH INTERFACE" button when lit
 5. Flip the switch off to stop the app
 
+### Portal Scraper Credentials + Run
+
+The Portal Scraper card includes a dedicated credential-and-run section so you can launch a scrape directly from the panel.
+
+1. Open the Daily Tools panel and find Portal Scraper Demo.
+2. Fill in login fields (username/password) and either:
+   - Listing URL for live scrape, or
+   - Demo HTML path for offline/demo mode.
+3. Leave "Export metadata to Google Sheets" enabled and provide:
+  - Spreadsheet ID
+  - Worksheet name (default: `PortalData`)
+  - Optional service account JSON file path
+  - Pick a field preset (Full, Finance, Minimal) and adjust the sheet fields list (comma or newline separated) if needed
+4. Click RUN SCRAPE.
+
+Notes:
+
+- The control panel passes credentials to the scraper process via runtime environment variables and does not write them to disk.
+- If no sink folder is provided, a default sink is used automatically:
+  - `PORTAL_SCRAPE_SINK_DIR` when set, otherwise
+  - `<repo>/portal_downloads`
+- The scraper writes `portal_snapshot.json` and downloaded PDFs to the sink folder.
+- When Sheets export is enabled, the scraper appends normalized records to your target worksheet.
+- You can control field order/selection from the panel (or `PORTAL_SHEET_FIELDS`).
+
+### Parser and Output Customization Map
+
+If you want to change what gets parsed and what gets written to Google Sheets, these are the main edit points:
+
+1. Scrape extraction logic:
+  - `portal_ingest/portal_scraper_demo.py`
+  - `parse_demo_html(...)` controls how table rows and PDF links are extracted from HTML.
+2. Record normalization logic:
+  - `portal_parser_demo/portal_parser_demo.py`
+  - `normalize_record(...)` maps source fields to normalized keys (`document_id`, `title`, `client`, etc.).
+3. Google Sheets column mapping/order:
+  - `google_sheet_exporter/google_sheet_exporter.py`
+  - `DEFAULT_FIELDS` controls column order and selected fields.
+  - `_to_row_values(...)` controls value formatting before append.
+  - Runtime overrides now come from the portal card field editor (`PORTAL_SHEET_FIELDS`).
+4. End-to-end orchestration:
+  - `portal_ingest/portal_scraper_demo.py`
+  - `scrape_portal(...)` runs scrape → manifest write → optional Sheets export.
+
 ## Onboard a New User
 
 1. **Pick their persona**: Decide whether the user should receive the full admin cockpit or the restricted scientist cockpit. Set `CONTROL_PANEL_DEFAULT_PERSONA` accordingly in the `.env`, shell profile, or `.service` unit you ship to them.
