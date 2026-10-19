@@ -45,6 +45,12 @@ python_tools:
     type: script
     description: Demo parser that normalizes portal snapshot rows for Sheets, database export, and follow-on parsing
 
+  - id: supplier-portal-pipeline
+    name: Supplier Portal Fetch + Canonical Rows
+    path: portal_ingest/supplier_portal_pipeline.py
+    type: script
+    description: Fetch authenticated supplier-portal submissions/assignments and normalize them to canonical rows using the existing .env credentials
+
   - id: google-sheets-exporter
     name: Google Sheets Exporter
     path: google_sheet_exporter/google_sheet_exporter.py
@@ -202,6 +208,7 @@ panel_groups:
       - data-capture-email-triage
       - portal-scrape-demo
       - portal-parser-demo
+      - supplier-portal-pipeline
       - google-sheets-exporter
     dash_ids:
       - daily-use-aggregator
